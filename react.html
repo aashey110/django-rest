@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Page</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- React and ReactDOM CDN -->
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <!-- Babel CDN for JSX support -->
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useEffect, useState } = React;
+
+        const RecipePage = () => {
+            const [recipes, setRecipes] = useState([]);
+
+            useEffect(() => {
+                fetch('http://localhost:8000/recipe/')
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data);
+                        setRecipes(data);
+                    });
+            }, []);
+
+            return (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 p-4">
+                    {recipes && recipes.map((recipe) => (
+                        <div key={recipe.id} className="recipe-card border rounded-lg p-4 shadow-lg">
+                            <h2 className="text-2xl font-bold mb-2">{recipe.title}</h2>
+                            <p className="mb-4 text-gray-700">{recipe.description}</p>
+                            {recipe.image && <img src={`http://localhost:8000${recipe.image}`} alt={recipe.title} className="w-full h-48 object-cover mb-4 rounded-lg" />}
+                            <h3 className="text-xl font-semibold mb-2">Ingredients</h3>
+                            <ul className="list-disc list-inside mb-4">
+                                {recipe.ingredients.split(',').map((ingredient, index) => (
+                                    <li key={index} className="text-gray-600">{ingredient}</li>
+                                ))}
+                            </ul>
+                            <h3 className="text-xl font-semibold mb-2">Instructions</h3>
+                            <p className="mb-4 text-gray-700">{recipe.instructions}</p>
+                            {recipe.duration && <p className="text-gray-600">Duration: {recipe.duration}</p>}
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<RecipePage />, document.getElementById('root'));
+    </script>
+</body>
+</html>
